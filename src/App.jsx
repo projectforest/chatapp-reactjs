@@ -22,16 +22,20 @@ class App extends Component {
     super(props);
     this.state = chatData;
     this.handleInputMessage = this.handleInputMessage.bind(this);
-    this.socket = new WebSocket("ws://localhost:3001");
+    this.socketConnection = new WebSocket("ws://localhost:3001");
+    this.sendMessage = this.sendMessage.bind(this);
+  }
+
+  sendMessage = (message) => {
+    this.socketConnection.send(JSON.stringify(message));
+    console.log('message sent to the server from client');
   }
   //handleInputMessage = message() {}
   handleInputMessage = (message) => {
     const newMessage = {id: 3, username: message.username, content: message.content}
     const messages = this.state.messages.concat(newMessage);
     this.setState({messages});
-    console.log(messages);
-
-    this.socket.send(newMessage);
+    this.sendMessage({message: message});
   }
 
   componentDidMount() {

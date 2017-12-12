@@ -7,7 +7,7 @@ class MessageList extends Component {
       <main className="messages">
         <Message/>
         {
-           this.props.messages.map((chatObj, index) => <Message index= {index} chatUsername= {chatObj.username} chatMessage={chatObj.content} />)
+           this.props.messages.map(chatObject => <Message index={chatObject.id} chatUsername= {chatObject.username} chatMessage={chatObject.content} />)
          }
         <div className="message system">
         </div>

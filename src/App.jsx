@@ -3,13 +3,15 @@ import MessageList from './MessageList.jsx';
 import ChatBar from './ChatBar.jsx';
 
 const chatData = {
-  currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
+  currentUser: {username: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
   messages: [
    {
+     id: 1,
      username: "Bob",
      content: "123"
    },
    { 
+     id: 2,
      username: "deadpool",
      content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
    }
@@ -19,7 +21,19 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = chatData;
+    this.handleInputMessage = this.handleInputMessage.bind(this);
   }
+  //handleInputMessage = message() {}
+  handleInputMessage = (message) => {
+    const newMessage = {id: 3, username: message.username, content: message.content}
+    const messages = this.state.messages.concat([newMessage]);
+    this.setState({messages});
+  }
+
+  componentDidMount() {
+
+  }
+
   render() {
     return (
       <div>
@@ -27,7 +41,7 @@ class App extends Component {
           <a href="/" className="navbar-brand">ChatApp</a>
         </nav>
       <MessageList messages={this.state.messages}/>
-      <ChatBar currentUser={this.state.currentUser}/>
+      <ChatBar handleInputMessage={this.handleInputMessage} currentUser={this.state.currentUser}/>
       </div>
     );
   }

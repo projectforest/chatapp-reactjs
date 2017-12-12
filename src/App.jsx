@@ -2,28 +2,17 @@ import React, {Component} from 'react';
 import MessageList from './MessageList.jsx';
 import ChatBar from './ChatBar.jsx';
 
-const chatData = {
-  currentUser: {username: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
-  messages: [
-   {
-     id: 1,
-     username: "Bob",
-     content: "123"
-   },
-   { 
-     id: 2,
-     username: "deadpool",
-     content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
-   }
-  ]
-}
 class App extends Component {
   constructor(props){
     super(props);
-    this.state = chatData;
+    this.state = {
+      currentUser: {name: "Bob"},
+      messages: []
+    };
     this.handleInputMessage = this.handleInputMessage.bind(this);
     this.socketConnection = new WebSocket("ws://localhost:3001");
     this.sendMessage = this.sendMessage.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   sendMessage = (message) => {
@@ -32,13 +21,20 @@ class App extends Component {
   }
   //handleInputMessage = message() {}
   handleInputMessage = (message) => {
-    const newMessage = {id: 3, username: message.username, content: message.content}
-    const messages = this.state.messages.concat(newMessage);
-    this.setState({messages});
-    this.sendMessage({message: message});
+    const newMessage = {username: message.username, content: message.content};
+    console.log('newMessage: ', newMessage);
+    this.sendMessage({message: newMessage});
   }
 
   componentDidMount() {
+    this.socketConnection.onmessage = (event) => {
+      const serverData = JSON.parse(event.data);
+      console.log("data receiving from server: ", serverData);
+      const serverDataArray = [];
+      serverDataArray.push(serverData.message);
+      //add new data to list, fetch all data from server
+      this.setState({messages: this.state.messages.concat(serverDataArray)});
+    }
 
   }
 

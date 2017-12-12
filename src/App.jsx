@@ -21,17 +21,40 @@ class App extends Component {
   }
   //handleInputMessage = message() {}
   handleInputMessage = (message) => {
-    const newMessage = {username: message.username, content: message.content};
+    console.log(message);
+    if(this.state.currentUser.name !== message.username) {
+      const newNotification = {type: "postNotification", content: `${this.state.currentUser.name} has changed their name to ${message.username}`}
+      this.state.currentUser.name = message.username;
+      console.log('newNotification: ', newNotification);
+      this.sendMessage({message: newNotification});
+    }
+    // send message to server
+    const newMessage = {type: "postMessage", username: message.username, content: message.content};
     console.log('newMessage: ', newMessage);
     this.sendMessage({message: newMessage});
   }
 
   componentDidMount() {
     this.socketConnection.onmessage = (event) => {
-      const serverData = JSON.parse(event.data);
+      let serverData = JSON.parse(event.data);
       console.log("data receiving from server: ", serverData);
+      console.log('serverdata.message', serverData.message);
       const serverDataArray = [];
-      serverDataArray.push(serverData.message);
+      if(Number.isInteger(serverData.counter)) {
+        this.state.onlineUsers = serverData.counter;
+      } 
+      else {
+        switch(serverData.message.type) {
+          case "incomingMessage":
+          serverDataArray.push(serverData.message);
+          break;
+          case "incomingNotification":
+          serverDataArray.push(serverData.message);
+          break;
+          default:
+          throw new Error("Unknown event type: " + serverData.message.type);
+         }
+       }
       //add new data to list, fetch all data from server
       this.setState({messages: this.state.messages.concat(serverDataArray)});
     }
